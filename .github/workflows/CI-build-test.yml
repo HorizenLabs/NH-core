@@ -4,7 +4,7 @@ run-name: "Workflow performing CI steps: build, unit testing, integration testin
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened]
   push:
     branches: [main]
   workflow_dispatch:
