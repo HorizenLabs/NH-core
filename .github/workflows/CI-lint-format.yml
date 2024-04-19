@@ -4,9 +4,8 @@ run-name: "Workflow performing CI steps: linting and formatting"
 
 on:
   pull_request:
-    types: [opened, synchronize]
-  push:
-    branches: [main]
+    types: [opened]
+  merge_group:
   workflow_dispatch:
 
 env:

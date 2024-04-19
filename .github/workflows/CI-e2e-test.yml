@@ -12,7 +12,7 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  build-test:
+  e2e:
     strategy:
       matrix:
         os: [ubuntu-latest]
