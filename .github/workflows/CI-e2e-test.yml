@@ -5,8 +5,7 @@ run-name: "Workflow performing CI steps: end-to-end tests on zombienet"
 on:
   pull_request:
     types: [opened]
-  push:
-    branches: [main]
+  merge_group:
   workflow_dispatch:
 
 env:
