@@ -78,6 +78,7 @@ scale-info = { version = "2.10.0", default-features = false, features = [
     "serde",
 ] }
 
+pallet-utility = { default-features = false, version = "27.0.0" }
 pallet-offences = { default-features = false, version = "26.0.0" }
 pallet-im-online = { default-features = false, version = "26.0.0" }
 pallet-authorship = { default-features = false, version = "27.0.0" }

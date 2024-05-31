@@ -19,6 +19,7 @@ scale-info = { workspace = true, default-features = false, features = [
 	"serde",
 ] }
 
+pallet-utility = { workspace = true, default-features = false }
 pallet-offences = { workspace = true, default-features = false }
 pallet-im-online = { workspace = true, default-features = false }
 pallet-authorship = { workspace = true, default-features = false }
@@ -135,6 +136,7 @@ std = [
 	"pallet-settlement-fflonk/std",
 	"pallet-settlement-zksync/std",
 	"pallet-poe/std",
+    "pallet-utility/std",
 	"proof-of-existence-rpc-runtime-api/std",
 	"scale-info/std",
 	"serde_json/std",
@@ -157,6 +159,7 @@ std = [
 	"sp-weights/std",
 	"substrate-wasm-builder",
 ]
+    "pallet-utility/runtime-benchmarks",
 try-runtime = [
 	"frame-executive/try-runtime",
 	"frame-support/try-runtime",
@@ -177,5 +180,6 @@ try-runtime = [
 	"pallet-settlement-fflonk/try-runtime",
 	"pallet-settlement-zksync/try-runtime",
 	"pallet-poe/try-runtime",
+    "pallet-utility/try-runtime",
 	"sp-runtime/try-runtime",
 ]

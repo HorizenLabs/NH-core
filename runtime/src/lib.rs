@@ -498,6 +498,13 @@ impl pallet_offences::Config for Runtime {
     type OnOffenceHandler = Staking;
 }
 
+impl pallet_utility::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type RuntimeCall = RuntimeCall;
+    type PalletsOrigin = OriginCaller;
+    type WeightInfo = pallet_utility::weights::SubstrateWeight<Runtime>;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub struct Runtime {
@@ -516,7 +523,7 @@ construct_runtime!(
         ImOnline: pallet_im_online,
         SettlementFFlonkPallet: pallet_settlement_fflonk,
         Poe: pallet_poe,
-        SettlementZksyncPallet: pallet_settlement_zksync,
+        Utility: pallet_utility,
     }
 );
 
