@@ -84,6 +84,8 @@ pallet-poe = { default-features = false, workspace = true }
 static_assertions = "1.1.0"
 proof-of-existence-rpc-runtime-api = { default-features = false, workspace = true }
 
+pallet-vesting = { workspace = true, default-features = false}
+
 [build-dependencies]
 substrate-wasm-builder = { workspace = true, optional = true }
 
@@ -106,6 +108,7 @@ runtime-benchmarks = [
 	"pallet-settlement-zksync/runtime-benchmarks",
 	"pallet-poe/runtime-benchmarks",
 	"pallet-staking/runtime-benchmarks",
+    "pallet-vesting/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 ]
 default = ["std"]
@@ -135,6 +138,7 @@ std = [
 	"pallet-settlement-fflonk/std",
 	"pallet-settlement-zksync/std",
 	"pallet-poe/std",
+    "pallet-vesting/std",
 	"proof-of-existence-rpc-runtime-api/std",
 	"scale-info/std",
 	"serde_json/std",
@@ -177,5 +181,6 @@ try-runtime = [
 	"pallet-settlement-fflonk/try-runtime",
 	"pallet-settlement-zksync/try-runtime",
 	"pallet-poe/try-runtime",
+    "pallet-vesting/try-runtime",
 	"sp-runtime/try-runtime",
 ]

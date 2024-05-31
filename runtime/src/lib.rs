@@ -29,7 +29,7 @@ use sp_api::impl_runtime_apis;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
-    traits::{BlakeTwo256, Block as BlockT, IdentifyAccount, NumberFor, One, OpaqueKeys, Verify},
+    traits::{BlakeTwo256, Block as BlockT, ConvertInto, IdentifyAccount, NumberFor, One, OpaqueKeys, Verify},
     transaction_validity::{TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, MultiSignature,
 };
@@ -44,7 +44,7 @@ use frame_election_provider_support::{
     onchain::OnChainExecution,
     SequentialPhragmen,
 };
-use frame_support::genesis_builder_helper::{build_config, create_default_config};
+use frame_support::{genesis_builder_helper::{build_config, create_default_config}, traits::WithdrawReasons};
 
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
@@ -495,6 +495,24 @@ impl pallet_offences::Config for Runtime {
     type OnOffenceHandler = Staking;
 }
 
+use pallet_vesting;
+
+parameter_types! {
+	pub const MinVestedTransfer: Balance = 100 * CENTS;
+	pub UnvestedFundsAllowedWithdrawReasons: WithdrawReasons =
+		WithdrawReasons::except(WithdrawReasons::TRANSFER | WithdrawReasons::RESERVE);
+}
+
+impl pallet_vesting::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type Currency = Balances;
+    type BlockNumberToBalance = ConvertInto;
+    type MinVestedTransfer = MinVestedTransfer;
+    type WeightInfo = pallet_vesting::weights::SubstrateWeight<Runtime>;
+    type UnvestedFundsAllowedWithdrawReasons = UnvestedFundsAllowedWithdrawReasons;
+    const MAX_VESTING_SCHEDULES: u32 = 32;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub struct Runtime {
@@ -514,6 +532,7 @@ construct_runtime!(
         SettlementFFlonkPallet: pallet_settlement_fflonk,
         Poe: pallet_poe,
         SettlementZksyncPallet: pallet_settlement_zksync,
+        Vesting: pallet_vesting,
     }
 );
 

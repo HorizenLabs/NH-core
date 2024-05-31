@@ -4758,6 +4758,7 @@ dependencies = [
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
+ "pallet-vesting",
  "parity-scale-codec",
  "proof-of-existence-rpc-runtime-api",
  "scale-info",
@@ -5324,6 +5325,22 @@ dependencies = [
  "sp-api",
  "sp-runtime",
  "sp-weights",
+]
+
+[[package]]
+name = "pallet-vesting"
+version = "27.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9efa19c0258d21cda531b7e81532ce6fb28c10f99f406c051852ed51f28dcefd"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "log",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]

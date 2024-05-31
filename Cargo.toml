@@ -138,6 +138,8 @@ frame-system-benchmarking = { default-features = false, version = "27.0.0" }
 substrate-wasm-builder = { version = "16.0.0" }
 substrate-build-script-utils = { version = "10.0.0" }
 
+pallet-vesting = { default-features = false, version = "27.0.0"}
+
 [profile.release]
 # Polkadot runtime requires unwinding.
 panic = "unwind"
