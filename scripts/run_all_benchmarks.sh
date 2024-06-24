@@ -30,10 +30,19 @@ fi
 
 USE_DOCKER_IMAGE=${USE_DOCKER_IMAGE:=""}
 
+USE_BASE_PATH="${USE_BASE_PATH:-}"
+BASE_PATH_MNT=""
+BASE_PATH_ARG=""
+[ -n "${USE_BASE_PATH:-}" ] && BASE_PATH_ARG="--base-path=${USE_BASE_PATH}" && BASE_PATH_MNT="-v ${USE_BASE_PATH}:${USE_BASE_PATH}"
+
 # The following line ensure we know the project root
 SOURCE_ROOT=${SOURCE_ROOT:-$(git rev-parse --show-toplevel)}
 
 . "${SOURCE_ROOT}/scripts/bench_cfg.sh"
+
+if [ -n ${USE_DOCKER_IMAGE:-} ] && [ -n "${BUILD_DOCKER_IMAGE:-}" ]; then
+  docker build --build-arg PROFILE=production --build-arg FEATURES=runtime-benchmarks --progress=plain -f "${PROJECT_ROOT}/docker/dockerfiles/hl-node.Dockerfile" -t "${USE_DOCKER_IMAGE}" "${PROJECT_ROOT}"
+fi
 
 BENCH_SH=${BENCH_SH:-"${SOURCE_ROOT}/scripts/bench.sh"}
 # Define the error file.
@@ -52,7 +61,7 @@ cargo build \
   SKIP_LINES=2
 else
   # The executable to use.
-  NH_NODE="docker run -ti --rm -v ${PROJECT_ROOT}:/data/benchmark --entrypoint /usr/local/bin/nh-node ${USE_DOCKER_IMAGE}"
+  NH_NODE="docker run --user=$(id -u):$(id -g) --rm -v ${PROJECT_ROOT}:/data/benchmark ${BASE_PATH_MNT} --entrypoint /usr/local/bin/nh-node ${USE_DOCKER_IMAGE}"
 
   # Now PROJECT_ROOT become the docker folder
   PROJECT_ROOT="/data/benchmark"
@@ -136,6 +145,7 @@ for PALLET in "${PALLETS[@]}"; do
     BM_STEPS="${BM_STEPS}" \
     BM_REPEAT="${BM_REPEAT}" \
     BM_HEAP_PAGES="${BM_HEAP_PAGES}" \
+    BASE_PATH_ARG="${BASE_PATH_ARG}" \
     "${BENCH_SH}" "${PALLET_NAME}" 2>&1
   )
 
@@ -153,7 +163,8 @@ OUTPUT=$(
   --weight-path="${WEIGHTS_FOLDER}" \
   --header="${CODE_HEADER}" \
   --warmup=10 \
-  --repeat=100 2>&1
+  --repeat=100 \
+  ${BASE_PATH_ARG} 2>&1
 )
 
 if [ $? -ne 0 ]; then
@@ -163,7 +174,7 @@ fi
 
 echo "[+] Benchmarking the machine..."
 OUTPUT=$(
-  ${NH_NODE} benchmark machine --chain=dev 2>&1
+  ${NH_NODE} benchmark machine --chain=dev ${BASE_PATH_ARG} 2>&1
 )
 if [ $? -ne 0 ]; then
   # Do not write the error to the error file since it is not a benchmarking error.
