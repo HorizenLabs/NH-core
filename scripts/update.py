@@ -61,7 +61,7 @@ if __name__ == "__main__":
                         version = str(library_info["version"])
                         version_updated = workspace_toml["workspace"]["dependencies"][library_name]
                         version_updated["version"]=polkadot_libs[library_name]
-                        version_updated = str(version_updated).replace("'", "\"")
+                        version_updated = str(version_updated).replace("'", "\"").replace("{", "{ ").replace("}", " }")
                     elif str(library_info).count("{") == 0:
                         version = str(library_info)
                         version_updated = workspace_toml["workspace"]["dependencies"][library_name]
@@ -91,10 +91,6 @@ if __name__ == "__main__":
             toml.dump(workspace_toml, workspace_file)
 
 
-        # Step 2: Checkout a specific branch (e.g., 'main' or 'develop')
-        branch_name = "release-crates-io-v1.6.0"  # Replace with the desired branch name
-        repo = Repo(tmp_dir)
-        repo.git.checkout(branch_name)
         print(f"Updating at {repo.head.commit}")
     
         # Optional: Pull the latest changes from the remote branch
