@@ -68,8 +68,10 @@ if __name__ == "__main__":
                         print("Unable to determine library version!")
                     if version != polkadot_libs[library_name]:
                         print(f"{library_name} should be upgraded (from {version} to {polkadot_libs[library_name]})")
-        
 
+        workspace_file = f"{os.getcwd()}/Cargo.toml"
+        with open(workspace_file) as workspace_file:
+            toml.dump(workspace_toml, workspace_file) #ERROR
 
 
         # Step 2: Checkout a specific branch (e.g., 'main' or 'develop')
