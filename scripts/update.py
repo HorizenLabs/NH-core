@@ -59,15 +59,17 @@ if __name__ == "__main__":
                     library_info = workspace_toml["workspace"]["dependencies"][library_name]
                     if ("version" in library_info):
                         version = str(library_info["version"])
+                        version_updated = workspace_toml["workspace"]["dependencies"][library_name]
+                        version_updated["version"] = polkadot_libs[library_name]
                         version_updated = "{ " + toml.dumps(version_updated).replace("\n", ", ")[0:-2] + " }"
                     elif str(library_info).count("{") == 0:
                         version = str(library_info)
-                        version_updated = toml.dumps(version_updated)
+                        version_updated = f"\"{polkadot_libs[library_name]}\""
                     else:
                         print(f"WARNING: unable to determine library version for {library_name}!")
                     if version != polkadot_libs[library_name]:
                         print(f"{library_name} is going to be upgraded (from {version} to {polkadot_libs[library_name]})")
-                        zkverify_deps[library_name]=version_updated
+                        zkverify_deps[library_name] = version_updated
 
         workspace_file_path = f"{os.getcwd()}/Cargo.toml"
         with open(workspace_file_path, 'r') as workspace_file:
