@@ -78,15 +78,6 @@ if __name__ == "__main__":
         for read_line in read_lines:
             library_name = read_line.split("=")[0].strip()
             if (library_name in zkverify_deps):
-                index = read_line.find("version")
-                if (index > -1):
-                    substring = read_line[index:]
-
-                else:
-                    print("here handle single value")
-
-
-                # if (read_line.find("version"))
                 lines_to_write.append(f"{library_name} = {zkverify_deps[library_name]}\n")
             else:
                 lines_to_write.append(read_line)
