@@ -59,15 +59,12 @@ if __name__ == "__main__":
                     library_info = workspace_toml["workspace"]["dependencies"][library_name]
                     if ("version" in library_info):
                         version = str(library_info["version"])
-                        version_updated = workspace_toml["workspace"]["dependencies"][library_name]
-                        version_updated["version"]=f"\"{polkadot_libs[library_name]}\""
-                        version_updated = str(version_updated).replace("'", "").replace("{", "{ ").replace("}", " }")
+                        version_updated = "{ " + toml.dumps(version_updated).replace("\n", ", ")[0:-2] + " }"
                     elif str(library_info).count("{") == 0:
                         version = str(library_info)
-                        version_updated = workspace_toml["workspace"]["dependencies"][library_name]
-                        version_updated = f"\"{polkadot_libs[library_name]}\""
+                        version_updated = toml.dumps(version_updated)
                     else:
-                        print(f"Unable to determine library version for {library_name}!")
+                        print(f"WARNING: unable to determine library version for {library_name}!")
                     if version != polkadot_libs[library_name]:
                         print(f"{library_name} is going to be upgraded (from {version} to {polkadot_libs[library_name]})")
                         zkverify_deps[library_name]=version_updated
@@ -79,6 +76,15 @@ if __name__ == "__main__":
         for read_line in read_lines:
             library_name = read_line.split("=")[0].strip()
             if (library_name in zkverify_deps):
+                index = read_line.find("version")
+                if (index > -1):
+                    substring = read_line[index:]
+
+                else:
+                    print("here handle single value")
+
+
+                # if (read_line.find("version"))
                 lines_to_write.append(f"{library_name} = {zkverify_deps[library_name]}\n")
             else:
                 lines_to_write.append(read_line)
