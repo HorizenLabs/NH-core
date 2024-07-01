@@ -75,17 +75,17 @@ if __name__ == "__main__":
         with open(workspace_file_path, 'r') as workspace_file:
             read_lines = workspace_file.readlines()
         lines_to_write = []
+        multi_line_lib = False
         for read_line in read_lines:
             library_name = read_line.split("=")[0].strip()
             if (library_name in zkverify_deps):
                 lines_to_write.append(f"{library_name} = {zkverify_deps[library_name]}\n")
+                if read_line.count("{") == 1 and read_line.count("}") == 0:
+                    multi_line_lib = True
             else:
-                lines_to_write.append(read_line)
+                if  (not multi_line_lib):
+                    lines_to_write.append(read_line)
+                if read_line.count("{") == 0 and read_line.count("}") == 1:
+                    multi_line_lib = False
         with open(workspace_file_path, 'w') as workspace_file:
             lines = workspace_file.writelines(lines_to_write)
-
-
-        # print(f"Updating at {repo.head.commit}")
-    
-        # # Optional: Pull the latest changes from the remote branch
-        # repo.git.pull()
