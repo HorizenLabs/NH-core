@@ -60,8 +60,8 @@ if __name__ == "__main__":
                     if ("version" in library_info):
                         version = str(library_info["version"])
                         version_updated = workspace_toml["workspace"]["dependencies"][library_name]
-                        version_updated["version"]=polkadot_libs[library_name]
-                        version_updated = str(version_updated).replace("'", "\"").replace("{", "{ ").replace("}", " }")
+                        version_updated["version"]=f"\"{polkadot_libs[library_name]}\""
+                        version_updated = str(version_updated).replace("'", "").replace("{", "{ ").replace("}", " }")
                     elif str(library_info).count("{") == 0:
                         version = str(library_info)
                         version_updated = workspace_toml["workspace"]["dependencies"][library_name]
@@ -86,12 +86,7 @@ if __name__ == "__main__":
             lines = workspace_file.writelines(lines_to_write)
 
 
-
-        with open(workspace_file_path, "w") as workspace_file:
-            toml.dump(workspace_toml, workspace_file)
-
-
-        print(f"Updating at {repo.head.commit}")
+        # print(f"Updating at {repo.head.commit}")
     
-        # Optional: Pull the latest changes from the remote branch
-        repo.git.pull()
+        # # Optional: Pull the latest changes from the remote branch
+        # repo.git.pull()
