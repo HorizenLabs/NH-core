@@ -200,49 +200,49 @@ jobs:
             echo "E2E_TEST_JOB_EMOJI=:red_circle:" >> $GITHUB_ENV
           fi
       - name: Send Slack Notification
-        uses: slackapi/slack-github-action@v1.25.0
-        with:
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ env.OVERALL_STATUS_EMOJI }} *ZKVERIFY BUILD STATUS:* ${{ needs.set-overall-result.outputs.overall-status }} ${{ env.OVERALL_STATUS_EMOJI }}\n*Pull Request:* ${{ needs.set-overall-result.outputs.pr-url }}\n*Branch:* https://github.com/${{ github.event.repository.full_name }}/tree/${{ needs.set-overall-result.outputs.branch-name }}\n*Commit:* https://github.com/${{ github.event.repository.full_name }}/commits/${{ needs.set-overall-result.outputs.last-commit-sha }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ env.BUILD_TEST_JOB_EMOJI }} *Build & Test:* ${{ needs.build-test-job.result }}\n\n${{ env.UNIT_TEST_SUMMARY }}\n${{ env.INTEGRATION_TEST_SUMMARY }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ env.TEST_COVERAGE_JOB_EMOJI }} *Test Coverage:* ${{ needs.test-coverage-job.result }}\n\n${{ env.COVERAGE_TEST_SUMMARY }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ env.LINT_FORMAT_JOB_EMOJI }} *Lint & Format:*  ${{ needs.lint-format-job.result }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ env.E2E_TEST_JOB_EMOJI }} *Zombienet Tests:* ${{ needs.e2e-test-job.result }}\n\n${{ env.E2E_TEST_SUMMARY }}"
-                  }
+      uses: slackapi/slack-github-action@v1.25.0
+      with:
+        payload: |
+          {
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ env.OVERALL_STATUS_EMOJI }} *ZKVERIFY BUILD STATUS:* ${{ needs.set-overall-result.outputs.overall-status }} ${{ env.OVERALL_STATUS_EMOJI }}\n\n${{ env.PR_LINK }} - ${{ env.BRANCH_LINK }} - ${{ env.COMMIT_LINK }}"
                 }
-              ]
-            }
-
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ env.BUILD_TEST_JOB_EMOJI }} *Build & Test:* ${{ needs.build-test-job.result }}\n\n${{ env.UNIT_TEST_SUMMARY }}\n${{ env.INTEGRATION_TEST_SUMMARY }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ env.TEST_COVERAGE_JOB_EMOJI }} *Test Coverage:* ${{ needs.test-coverage-job.result }}\n\n${{ env.COVERAGE_TEST_SUMMARY }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ env.LINT_FORMAT_JOB_EMOJI }} *Lint & Format:*  ${{ needs.lint-format-job.result }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ env.E2E_TEST_JOB_EMOJI }} *Zombienet Tests:* ${{ needs.e2e-test-job.result }}\n\n${{ env.E2E_TEST_SUMMARY }}"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        
