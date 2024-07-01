@@ -58,13 +58,16 @@ jobs:
       - name: Set overall result
         id: set-status
         run: |
-          OVERALL_STATUS="success"
-            
-          if [ "${{ needs.build-test-job.result }}" != "success" ] || 
-              [ "${{ needs.test-coverage-job.result }}" != "success" ] ||
-              [ "${{ needs.lint-format-job.result }}" != "success" ] || 
-              [ "${{ needs.e2e-test-job.result }}" != "success" ]; then
-            OVERALL_STATUS="failure"
+          if [ "${{ github.event.workflow_run.conclusion }}" == "cancelled" ]; then
+            OVERALL_STATUS="cancelled"
+          else
+            OVERALL_STATUS="success"
+            if [ "${{ needs.build-test-job.result }}" != "success" ] || 
+                [ "${{ needs.test-coverage-job.result }}" != "success" ] ||
+                [ "${{ needs.lint-format-job.result }}" != "success" ] || 
+                [ "${{ needs.e2e-test-job.result }}" != "success" ]; then
+              OVERALL_STATUS="failure"
+            fi
           fi
   
           echo Setting overall result
@@ -81,7 +84,7 @@ jobs:
   notify-slack:
     runs-on: ubuntu-latest
     needs: [build-test-job, test-coverage-job, lint-format-job, e2e-test-job, check-act, set-overall-result]
-    if: ${{ always() && needs.check-act.outputs.act == 'false' }}
+    if: ${{ always() && needs.check-act.outputs.act == 'false' && needs.set-overall-result.outputs.overall-status != 'cancelled' }}
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
@@ -141,18 +144,36 @@ jobs:
           fi
       - name: Prepare Slack Notification Data
         run: |
+          if [ "${{ needs.set-overall-result.outputs.pr-url }}" != "" ]; then
+            echo "PR_LINK=<${{ needs.set-overall-result.outputs.pr-url }}|Pull Request>" >> $GITHUB_ENV
+          else
+            echo "PR_LINK=N/A" >> $GITHUB_ENV
+          fi
+      
+          if [ "${{ needs.set-overall-result.outputs.branch-name }}" != "" ]; then
+          echo "BRANCH_LINK=<https://github.com/${{ github.event.repository.full_name }}/tree/${{ needs.set-overall-result.outputs.branch-name }}|${{ needs.set-overall-result.outputs.branch-name }}>" >> $GITHUB_ENV
+          else
+            echo "BRANCH_LINK=N/A" >> $GITHUB_ENV
+          fi
+      
+          if [ "${{ needs.set-overall-result.outputs.last-commit-sha }}" != "" ]; then
+            echo "COMMIT_LINK=<https://github.com/${{ github.event.repository.full_name }}/commit/${{ needs.set-overall-result.outputs.last-commit-sha }}|Commit>" >> $GITHUB_ENV
+          else
+            echo "COMMIT_LINK=N/A" >> $GITHUB_ENV
+          fi
+      
           if [ "${{ needs.set-overall-result.outputs.overall-status }}" = "success" ]; then
             echo "OVERALL_STATUS_EMOJI=:large_green_circle:" >> $GITHUB_ENV
           else
             echo "OVERALL_STATUS_EMOJI=:alert:" >> $GITHUB_ENV
           fi
-
+      
           if [[ "${{ needs.build-test-job.result }}" == "success" ]]; then
             echo "BUILD_TEST_JOB_EMOJI=:large_green_circle:" >> $GITHUB_ENV
           else
             echo "BUILD_TEST_JOB_EMOJI=:red_circle:" >> $GITHUB_ENV
           fi
-
+      
           if [[ -z "${LINE_COVERAGE_PERCENT}" ]]; then
             if [[ "${{ needs.test-coverage-job.result }}" == "success" ]]; then
               echo "TEST_COVERAGE_JOB_EMOJI=:large_green_circle:" >> $GITHUB_ENV
@@ -166,13 +187,13 @@ jobs:
           else
             echo "TEST_COVERAGE_JOB_EMOJI=:red_circle:" >> $GITHUB_ENV
           fi
-
+      
           if [[ "${{ needs.lint-format-job.result }}" == "success" ]]; then
             echo "LINT_FORMAT_JOB_EMOJI=:large_green_circle:" >> $GITHUB_ENV
           else
             echo "LINT_FORMAT_JOB_EMOJI=:red_circle:" >> $GITHUB_ENV
           fi
-
+      
           if [[ "${{ needs.e2e-test-job.result }}" == "success" ]]; then
             echo "E2E_TEST_JOB_EMOJI=:large_green_circle:" >> $GITHUB_ENV
           else
