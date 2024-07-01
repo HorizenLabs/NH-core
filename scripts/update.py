@@ -37,8 +37,8 @@ if __name__ == "__main__":
 
         polkadot_libs = {}
         dir = "/tmp/repo"
-        workspace_file = f"{dir}/Cargo.toml"
-        with open(workspace_file) as workspace_file:
+        workspace_file_path = f"{dir}/Cargo.toml"
+        with open(workspace_file_path) as workspace_file:
             workspace_toml = toml.load(workspace_file)
             for library_path in workspace_toml["workspace"]["members"]:
                 library_file = f"{dir}/{library_path}/Cargo.toml"
@@ -49,29 +49,46 @@ if __name__ == "__main__":
 
         print("\n----------\n")
 
-        workspace_file = f"{os.getcwd()}/Cargo.toml"
-        with open(workspace_file) as workspace_file:
+        workspace_file_path = f"{os.getcwd()}/Cargo.toml"
+        zkverify_deps = {}
+        with open(workspace_file_path) as workspace_file:
             workspace_toml = toml.load(workspace_file)
             for library_name in workspace_toml["workspace"]["dependencies"]:
                 if (library_name in polkadot_libs):
                     print(f"Library used: {library_name}")
                     library_info = workspace_toml["workspace"]["dependencies"][library_name]
                     if ("version" in library_info):
-                        print("Version as dict")
                         version = str(library_info["version"])
-                        workspace_toml["workspace"]["dependencies"][library_name]["version"]=polkadot_libs[library_name]
+                        version_updated = workspace_toml["workspace"]["dependencies"][library_name]
+                        version_updated["version"]=polkadot_libs[library_name]
+                        version_updated = str(version_updated).replace("'", "\"")
                     elif str(library_info).count("{") == 0:
-                        print("Version as string")
                         version = str(library_info)
-                        workspace_toml["workspace"]["dependencies"][library_name]=polkadot_libs[library_name]
+                        version_updated = workspace_toml["workspace"]["dependencies"][library_name]
+                        version_updated = f"\"{polkadot_libs[library_name]}\""
                     else:
-                        print("Unable to determine library version!")
+                        print(f"Unable to determine library version for {library_name}!")
                     if version != polkadot_libs[library_name]:
-                        print(f"{library_name} should be upgraded (from {version} to {polkadot_libs[library_name]})")
+                        print(f"{library_name} is going to be upgraded (from {version} to {polkadot_libs[library_name]})")
+                        zkverify_deps[library_name]=version_updated
 
-        workspace_file = f"{os.getcwd()}/Cargo.toml"
-        with open(workspace_file) as workspace_file:
-            toml.dump(workspace_toml, workspace_file) #ERROR
+        workspace_file_path = f"{os.getcwd()}/Cargo.toml"
+        with open(workspace_file_path, 'r') as workspace_file:
+            read_lines = workspace_file.readlines()
+        lines_to_write = []
+        for read_line in read_lines:
+            library_name = read_line.split("=")[0].strip()
+            if (library_name in zkverify_deps):
+                lines_to_write.append(f"{library_name} = {zkverify_deps[library_name]}\n")
+            else:
+                lines_to_write.append(read_line)
+        with open(workspace_file_path, 'w') as workspace_file:
+            lines = workspace_file.writelines(lines_to_write)
+
+
+
+        with open(workspace_file_path, "w") as workspace_file:
+            toml.dump(workspace_toml, workspace_file)
 
 
         # Step 2: Checkout a specific branch (e.g., 'main' or 'develop')
